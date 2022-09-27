@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MatchDataManager.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220927085114_firstMigration")]
+    [Migration("20220927092748_firstMigration")]
     partial class firstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
