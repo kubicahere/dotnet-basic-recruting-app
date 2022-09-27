@@ -4,6 +4,7 @@
     {
         IEnumerable<T> GetAllData();
         T GetDataById(Guid id);
+        IEnumerable<T> GetDataByName(string name);
 
         bool Add(T data);
         bool Update(T data);

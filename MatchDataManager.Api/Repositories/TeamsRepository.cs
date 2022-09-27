@@ -1,45 +1,57 @@
-﻿using MatchDataManager.Api.Models;
+﻿using MatchDataManager.Api.Database;
+using MatchDataManager.Api.Models;
 
 namespace MatchDataManager.Api.Repositories;
 
-public static class TeamsRepository
+public class TeamsRepository : IRepository<Team>
 {
-    private static readonly List<Team> _teams = new();
+    private readonly DataContext _dataContext;
 
-    public static void AddTeam(Team team)
+    public TeamsRepository(DataContext dataContext)
+    {
+        _dataContext = dataContext;
+    }
+
+    public IEnumerable<Team> GetAllData()
+    {
+        return _dataContext.Teams;
+    }
+    public Team GetDataById(Guid id)
+    {
+        return _dataContext.Teams.Where(x => x.Id == id).FirstOrDefault();
+    }
+    public IEnumerable<Team> GetDataByName(string name)
+    {
+        return _dataContext.Teams.Where(x =>x.Name == name).ToList();
+    }
+    public bool Add(Team team)
     {
         team.Id = Guid.NewGuid();
-        _teams.Add(team);
-    }
+        _dataContext.Add(team);
 
-    public static void DeleteTeam(Guid teamId)
-    {
-        var team = _teams.FirstOrDefault(x => x.Id == teamId);
-        if (team is not null)
-        {
-            _teams.Remove(team);
-        }
+        return Save();
     }
-
-    public static IEnumerable<Team> GetAllTeams()
+    public bool Update(Team team)
     {
-        return _teams;
-    }
-
-    public static Team GetTeamById(Guid id)
-    {
-        return _teams.FirstOrDefault(x => x.Id == id);
-    }
-
-    public static void UpdateTeam(Team team)
-    {
-        var existingTeam = _teams.FirstOrDefault(x => x.Id == team.Id);
+        var existingTeam = _dataContext.Teams.FirstOrDefault(x => x.Id == team.Id);
         if (existingTeam is null || team is null)
         {
             throw new ArgumentException("Team doesn't exist.", nameof(team));
         }
-
         existingTeam.CoachName = team.CoachName;
         existingTeam.Name = team.Name;
+
+        return Save();
+    }
+    public bool Delete(Team team)
+    {
+        _dataContext.Remove(team);
+
+        return Save();
+    }
+    public bool Save()
+    {
+        var save = _dataContext.SaveChanges();
+        return save > 0 ? true : false;
     }
 }
